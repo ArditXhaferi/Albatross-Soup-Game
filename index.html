@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://unpkg.com/typewriter-effect@latest/dist/core.js"></script>
+</head>
+<body>
+    <img class="wizard wave" src="wizard.png" alt="">
+    <div class="logo-container" width="100%">
+        <img width="50%" src="logo.png" alt="">
+    </div>
+    <video autoplay muted loop id="myVideo">
+        <source src="intro.mp4" type="video/mp4">
+      </video>
+    <div id="app_container" class="textbox">
+        <div id="app">
+        </div>
+        <input type="text" name="input" id="input">
+        <div id="answer"></div>
+    </div>
+</body>
+<style>
+
+    @keyframes wave {
+        0% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-20px);
+        }
+        100% {
+          transform: translateY(0);
+        }
+      }
+      
+      .wave {
+        animation: wave 1s ease-in-out infinite;
+      }
+
+    .logo-container{
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    #myVideo {
+        image-rendering: pixelated;
+        position: fixed;
+        right: 0;
+        bottom: 0;
+        min-width: 100%;
+        min-height: 100%;
+        display: none;
+    }
+
+    .wizard{
+        position: absolute;
+        left: 15%;
+        top: 20%;
+    }
+
+    #videobcg {
+        width: inherit;
+        height: inherit;
+        -o-filter: blur(15px);
+        filter: blur(15px);
+        object-fit: cover;
+        transform: scale(1.04);
+    }
+
+    @font-face {
+        font-family: "undertale";
+        src: url(font.ttf);
+    }      
+
+    body{
+        font-family: "undertale";
+    }
+
+    input{
+        font-size: 32px;
+        font-family: "undertale";
+        margin-top: 16px;
+        border: 0px;
+        border-bottom: 5px solid black;
+        display: none;
+        width: 100%;
+    }
+
+    input:focus{
+        outline: none;
+    }
+
+    .textbox{
+        background-color: white;
+        position: absolute;
+        bottom: 10%;
+        right: 50%;
+        transform: translateX(50%);
+        width: 70%;
+        height: 200px;
+        border: 5px solid black;
+        padding: 16px;
+        font-size: 32px;
+    }
+</style>
+<script>
+    var app = document.getElementById('app');
+    var app_container = document.getElementById('app_container');
+    var inputBox = document.getElementById('input');
+
+    let first = true
+
+    let options = {
+        method: 'POST',
+        headers: {
+          accept: 'application/json',
+          'content-type': 'application/json',
+          'X-API-KEY': 'ea746a61-04ec-485a-a38a-5c7fb70fedbf'
+        },
+        body: JSON.stringify({
+          enable_google_results: 'true',
+          enable_memory: false,
+          input_text: `Answer this with a simple yes or no “The Albatross Soup Riddle is a thought-provoking story about a man who was on a boat with his wife and friends. The boat sinks and they end up stranded on an island where they face starvation. The man's wife dies and his friends make soup out of her flesh without informing him. When they are rescued, the man goes to a restaurant to find out if the soup he had on the island was albatross soup. He finds out that it was not, which means he had consumed his wife, causing him to take his own life.” answer this question with a simple yes or no “Did he enjoy the soup”, the answer shouldn't exceed three characters`
+        })
+      };
+
+
+    var typewriter = new Typewriter(app, {
+        delay: 10,
+    });
+
+    writeStart()
+
+    document.addEventListener("keyup", function(event) {
+        if (event.code === "Space") {
+            if(first == true){
+                first = false;
+                writeIntro()
+            }
+        }
+    });
+
+    function writeStart(){
+        typewriter
+            .pauseFor(500)
+            .typeString('Press space to start...')
+            .start()
+    }
+
+
+
+    function writeIntro(){
+        var typewriter_container = document.getElementsByClassName('Typewriter__wrapper');
+
+        setTimeout(() => {
+            let video = document.getElementById("myVideo")
+            video.style.display = "block"
+        }, 1000)
+        
+        typewriter
+            .deleteAll()
+            .pauseFor(500)
+            .typeString('A man walks off a boat and he walks into a ')
+            .pauseFor(300)
+            .typeString('restaurant, orders albatross soup he takes ')
+            .pauseFor(300)
+            .typeString('one sip, pulls out a gun and <b>KILLS HIMSELF</b> <br><br>')
+            .pauseFor(1000)
+            .typeString('why did the man kill himself? Are you ready to start the riddle?')
+            .pauseFor(3000)
+            .deleteAll()
+            .callFunction(showGINI)
+            .typeString("Ask away! Solve this riddle earn my tresure")
+        
+    }
+
+    function showGINI(){
+        let cursor = document.getElementsByClassName('Typewriter__cursor')[0];
+        cursor.style.display = 'none'
+        inputBox.style.display = "block"
+        inputBox.focus()
+    }
+
+    let input = document.querySelector("input");
+
+    input.addEventListener("keyup", function(event) {
+    if (event.key === "Enter") {
+        // Code to be executed when the enter key is pressed
+        apiRequest(input.value)
+    }
+    });
+
+    function apiRequest(input){
+        let body = JSON.stringify({
+            enable_google_results: 'true',
+            enable_memory: true,
+            input_text: `
+            Pretend you are a Narrator, if the question asked reveals any important information related to the story, answer with “Yes, good question.” or if the question asked does not reveal any information or is not related to the story, answer with “No, not relevant.” on every other occasion answer with “Yes” or “No”, this is the story “The Albatross Soup Riddle is a thought-provoking story about a man who was on a boat with his wife and friends. The boat sank and the man, his wife and two of his friends made their way to a stranded island and they were starving. The first person closest to starving was the wife. Unbeknownst to him, the wife starves and his friends turn her into an Albatross Soup. He doesn’t know that the Albatross Soup he ate was his wife. Afterwards a rescue boat saves the man and his two friends and brings them to the shore. The man then goes to a restaurant alone and asks for an Albatross soup and he tries it only once. The reason he asks for an Albatross soup is to see if it tastes the same like the Albatross soup he tasted before. Then realizing it tastes different, he understands what he had done, which is, eating his wife unknowingly and the guilt ensues. The guilt overwhelms him and he decides to take his own life. Right after tasting the Albatross soup he picks up a gun and shoots himself. The man killed himself over the guilt of eating his own wife thinking it is an Albatross soup.” now answer as if you are the Narrator and I’m trying to reveal the story with questions and do not respond with anything besides these 4 options (“Yes, good question.”, “No, not relevant.”, “Yes”, “No”) answer this question "${input}".
+            `
+          })
+          options.body = body;
+
+          var typewriterAnswer = new Typewriter(document.getElementById("answer"), {
+            delay: 10,
+        });
+
+        typewriterAnswer
+        .typeString('...')
+        .start()
+
+        fetch('https://api.writesonic.com/v2/business/content/chatsonic?engine=premium', options)
+            .then(response => response.json())
+            .then((response) =>{
+                console.log(typewriterAnswer, response)
+                typewriterAnswer
+                    .typeString(response.message)
+                    .start()
+            })
+            .catch(err => console.error(err));
+    }
+
+
+
+    </script>
+</html>
