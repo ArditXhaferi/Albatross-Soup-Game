@@ -21,6 +21,15 @@
         <input type="text" name="input" id="input">
         <div id="answer"></div>
     </div>
+    <div class="timeline_button">
+        Timeline
+    </div>
+    <div class="ending_button">
+        Reveal Ending
+    </div>
+    <div class="timeline">
+        You have to ask some good questions first.
+    </div>
 </body>
 <style>
 
@@ -40,6 +49,58 @@
         animation: wave 1s ease-in-out infinite;
       }
 
+    .timeline{
+        position: absolute;
+        top: -100%;
+        right: 100px;
+        padding: 8px 16px;
+        cursor: pointer;
+        font-size: 18px;
+        border: 5px solid black;
+        width: 300px;
+        transition: .3s ease;
+        background-color: white;
+    }
+
+    .timeline_button{
+        transition: .3s ease;
+        position: absolute;
+        top: 0;
+        right: 100px;
+        padding: 8px 16px;
+        cursor: pointer;
+        font-size: 26px;
+        border-bottom: 5px solid black;
+        border-right: 5px solid black;
+        border-left: 5px solid black;
+        background-color: white;
+    }
+
+    .ending_button{
+        display: none;
+        transition: .3s ease;
+        position: absolute;
+        top: 0;
+        left: 100px;
+        padding: 8px 16px;
+        cursor: pointer;
+        font-size: 26px;
+        border-bottom: 5px solid black;
+        border-right: 5px solid black;
+        border-left: 5px solid black;
+        background-color: white;
+    }
+
+    .visible{
+        top: 16px;
+        transition: .3s ease;
+    }
+
+    .hide{
+        top: -100%;
+        transition: .3s ease;
+    }
+
     .logo-container{
         width: 100%;
         display: flex;
@@ -50,8 +111,9 @@
     #myVideo {
         image-rendering: pixelated;
         position: fixed;
-        right: 0;
-        bottom: 0;
+        right: 50%;
+        bottom: 50%;
+        transform: translate(50%, 50%);
         min-width: 100%;
         min-height: 100%;
         display: none;
@@ -89,6 +151,7 @@
         border-bottom: 5px solid black;
         display: none;
         width: 100%;
+        text-transform: uppercase;
     }
 
     input:focus{
@@ -102,7 +165,7 @@
         right: 50%;
         transform: translateX(50%);
         width: 70%;
-        height: 200px;
+        min-height: 200px;
         border: 5px solid black;
         padding: 16px;
         font-size: 32px;
@@ -136,6 +199,24 @@
 
     writeStart()
 
+    let timeline_button = document.querySelector(".timeline_button")
+    let ending_button = document.querySelector(".ending_button")
+    let timeline = document.querySelector(".timeline")
+
+    timeline_button.addEventListener('click', () =>{
+        timeline.classList.toggle('visible')
+        timeline_button.classList.toggle('hide')
+    })
+
+    timeline.addEventListener('click', () =>{
+        timeline.classList.toggle('visible')
+        timeline_button.classList.toggle('hide')
+    })
+
+    ending_button.addEventListener('click', () =>{
+        ending_func()
+    })
+
     document.addEventListener("keyup", function(event) {
         if (event.code === "Space") {
             if(first == true){
@@ -148,11 +229,22 @@
     function writeStart(){
         typewriter
             .pauseFor(500)
-            .typeString('Press space to start...')
+            .typeString('Press space to start... <br><br> Find the roots of the story')
             .start()
     }
 
+    function ending_func(){
+        app_container.innerHTML = `<div id="ending"></div>`
+        var typewriter_ending = new Typewriter(document.getElementById("ending"), {
+            delay: 75,
+        });
 
+        myVideo.src = "ending.mp4"
+
+        typewriter_ending
+            .typeString(ending)
+            .start()
+    }
 
     function writeIntro(){
         var typewriter_container = document.getElementsByClassName('Typewriter__wrapper');
@@ -175,7 +267,7 @@
             .pauseFor(3000)
             .deleteAll()
             .callFunction(showGINI)
-            .typeString("Ask away! Solve this riddle earn my tresure")
+            .typeString("Ask away! Solve this riddle earn my tresure! <br> <br> I can answer with 'Yes' or 'No'")
         
     }
 
@@ -195,12 +287,45 @@
     }
     });
 
+    let firstquestiondone = false;
+    let question_index = 0;
+
+    let ending = "On a stormy night at sea, a small boat with passengers inside crashed. Four survivors made it to a stranded island. A man, his wife, and two of their friends. The wife died of starvation unknowingly to the man. The friends said that they caught an Albatross and made a soup out of him. The man ridden with guilt, when he comes back he goes to a restaurant to reassure himself of the taste of the Albatross soup."
+
     function apiRequest(input){
+
+        if(input.toLowerCase().includes("did he eat his wife")){
+            ending_button.style.display = "block";
+        }
+
+        let inputs = input.split(" ")
+        let videos = [
+        "/boat, vessel, ship, craft, yacht, dinghy, barge, canoe, kayak, raft, paddleboat.mp4",
+        "/crash, wreck, sinking, sink, collision, accident.mp4",
+        "/albatross, bird, gull, seabird.mp4",
+        "/attacking, charging, assaulting, charging, advancing, invasion, ambush.mp4",
+        "/eating, drinking, tasting, sipping, sampling, trying.mp4"
+        ]
+
+        let playVideo = ""; 
+        
+        inputs.forEach((input, index, array) => {
+            videos.forEach((video, index) => {
+                if(video.includes(input)){
+                    playVideo = video
+                }
+            })
+        })
+
+        if(playVideo != ""){
+            myVideo.src = playVideo
+        }
+
         let body = JSON.stringify({
             enable_google_results: 'true',
             enable_memory: true,
             input_text: `
-            Pretend you are a Narrator, if the question asked reveals any important information related to the story, answer with “Yes, good question.” or if the question asked does not reveal any information or is not related to the story, answer with “No, not relevant.” on every other occasion answer with “Yes” or “No”, this is the story “The Albatross Soup Riddle is a thought-provoking story about a man who was on a boat with his wife and friends. The boat sank and the man, his wife and two of his friends made their way to a stranded island and they were starving. The first person closest to starving was the wife. Unbeknownst to him, the wife starves and his friends turn her into an Albatross Soup. He doesn’t know that the Albatross Soup he ate was his wife. Afterwards a rescue boat saves the man and his two friends and brings them to the shore. The man then goes to a restaurant alone and asks for an Albatross soup and he tries it only once. The reason he asks for an Albatross soup is to see if it tastes the same like the Albatross soup he tasted before. Then realizing it tastes different, he understands what he had done, which is, eating his wife unknowingly and the guilt ensues. The guilt overwhelms him and he decides to take his own life. Right after tasting the Albatross soup he picks up a gun and shoots himself. The man killed himself over the guilt of eating his own wife thinking it is an Albatross soup.” now answer as if you are the Narrator and I’m trying to reveal the story with questions and do not respond with anything besides these 4 options (“Yes, good question.”, “No, not relevant.”, “Yes”, “No”) answer this question "${input}".
+            Pretend you are a Narrator, if the question asked reveals any important information related to the story, answer with “Yes, good question.” on every other answer with “Yes” or “No”, this is the story “The Albatross Soup Riddle is a thought-provoking story about a man who was on a boat with his wife and friends. The boat sank and the man, his wife and two of his friends made their way to a stranded island and they were starving. The first person closest to starving was the wife. Unbeknownst to him, the wife starves and his friends turn her into an Albatross Soup. He doesn’t know that the Albatross Soup he ate was his wife. Afterwards a rescue boat saves the man and his two friends and brings them to the shore. The man then goes to a restaurant alone and asks for an Albatross soup and he tries it only once. The reason he asks for an Albatross soup is to see if it tastes the same like the Albatross soup he tasted before. Then realizing it tastes different, he understands what he had done, which is, eating his wife unknowingly and the guilt ensues. The guilt overwhelms him and he decides to take his own life. Right after tasting the Albatross soup he picks up a gun and shoots himself. The man killed himself over the guilt of eating his own wife thinking it is an Albatross soup.” now answer as if you are the Narrator and I’m trying to reveal the story with questions and do not respond with anything besides these 3 options (“Yes, good question.”, “Yes”, “No”) answer this question "${input}".
             `
           })
           options.body = body;
@@ -212,11 +337,17 @@
         typewriterAnswer
         .typeString('...')
         .start()
-
+        question_index++
         fetch('https://api.writesonic.com/v2/business/content/chatsonic?engine=premium', options)
             .then(response => response.json())
             .then((response) =>{
-                console.log(typewriterAnswer, response)
+                if(!firstquestiondone){
+                    timeline.innerHTML = ""
+                }
+                firstquestiondone = true
+                if(response.message.toLowerCase() == "yes, good question."){
+                    timeline.innerHTML += ("Question " + question_index + ": "  +input + "<br><br>")
+                }
                 typewriterAnswer
                     .typeString(response.message)
                     .start()
